@@ -15,6 +15,12 @@ foldFn current@(count, mark) currentMark = if mark == currentMark
 checkCount :: (Int, Mark) -> Bool
 checkCount (count, mark) = and[count >= 3, not $ mark == Empty]
 
+resultUgh :: GameRow -> Bool
+resultUgh (GameRow xs) = result xs
+
+resultN :: [GameRow] -> Bool
+resultN = any resultUgh
+
 data Mark = Oh
           | Ex
           | Empty
@@ -22,12 +28,29 @@ data Mark = Oh
 
 instance Arbitrary Mark where
   arbitrary = elements [Oh, Ex, Empty]
+  
+newtype GameRow = GameRow [Mark] deriving (Show, Eq)
+instance Arbitrary GameRow where
+  arbitrary = sized $ \s -> do
+    xs <- vectorOf 3 (elements [Oh, Ex, Empty])
+    return (GameRow xs)
 
 prop_only_empty_elements_is_no_result xs = and [not $ elem Oh xs, not $ elem Ex xs] ==> result xs == False
 
-three_in_a_row xs = or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]
-
 prop_three_in_a_row_has_a_result xs = or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]  ==> result xs == True
 
-prop_two_rows x1s x2s = any (three_in_a_row) [x1s, x2s] ==> result2 x1s x2s == True
-                        where result2 rowOne rowTwo = or [result rowOne, result rowTwo]
+prop_n_rows rows = and[any (three_in_a_row) rows, length rows == 3] ==> resultN rows == True
+
+prop_all_rows_start_with_x rows = and[all (headEquals Ex) rows, length rows == 3] ==> resultN rows == True 
+
+n_by_n :: Int -> [[a]] -> Bool
+n_by_n desired_n rows = and[length rows == desired_n, all (lenEqual desired_n) rows]
+
+three_in_a_row (GameRow xs) = or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]
+
+lenEqual :: Int -> [a] -> Bool
+lenEqual desired_len row = length row == desired_len
+                              
+headEquals :: Mark -> GameRow -> Bool                              
+headEquals x (GameRow (y:ys)) = x == y
+headEquals _ _ = False
