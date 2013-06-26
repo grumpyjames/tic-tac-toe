@@ -1,4 +1,7 @@
 import Test.QuickCheck
 
-prop_empty_list_is_no_result xs = (null xs) ==> result xs == False 
-  where result xs = False
+-- does the game have a result?
+result :: [Int] -> Bool
+result _ = False
+
+prop_list_of_two_elements_is_no_result xs = (length xs < 3) ==> result xs == False
