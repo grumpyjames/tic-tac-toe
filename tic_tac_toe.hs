@@ -13,7 +13,7 @@ foo current@(count, mark) currentMark = if mark == currentMark
                                              else current 
                                                
 checkCount :: (Int, Mark) -> Bool
-checkCount (count, mark) = count >= 3
+checkCount (count, mark) = and[count >= 3, not $ mark == Empty]
 
 data Mark = Oh
           | Ex
@@ -23,6 +23,6 @@ data Mark = Oh
 instance Arbitrary Mark where
   arbitrary = elements [Oh, Ex, Empty]
 
-prop_two_elements_is_no_result xs = (length xs < 3) ==> result xs == False
+prop_only_empty_elements_is_no_result xs = and [not $ elem Oh xs, not $ elem Ex xs] ==> result xs == False
 
 prop_three_in_a_row_has_a_result xs = ([Oh, Oh, Oh] `isInfixOf` xs) ==> result xs == True 
