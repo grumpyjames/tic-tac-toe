@@ -6,9 +6,10 @@ result :: [Mark] -> Bool
 result = checkCount . foldl foo (0, Empty)
 
 foo :: (Int, Mark) -> Mark -> (Int, Mark)
+foo win@(count, _) Empty = if count < 3 then (0, Empty) else win 
 foo current@(count, mark) currentMark = if mark == currentMark
                                         then (count + 1, mark)
-                                        else if count < 3
+                                        else if count < 3 
                                              then (1, currentMark)
                                              else current 
                                                
@@ -25,4 +26,4 @@ instance Arbitrary Mark where
 
 prop_only_empty_elements_is_no_result xs = and [not $ elem Oh xs, not $ elem Ex xs] ==> result xs == False
 
-prop_three_in_a_row_has_a_result xs = ([Oh, Oh, Oh] `isInfixOf` xs) ==> result xs == True 
+prop_three_in_a_row_has_a_result xs = or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]  ==> result xs == True 
