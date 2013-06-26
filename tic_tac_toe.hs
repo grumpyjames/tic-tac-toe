@@ -3,14 +3,14 @@ import Test.QuickCheck
 
 -- does the game have a result?
 result :: [Mark] -> Bool
-result = checkCount . foldl foo (0, Empty)
+result = checkCount . foldl foldFn (0, Empty)
 
-foo :: (Int, Mark) -> Mark -> (Int, Mark)
-foo win@(3, _) _ = win
-foo _ Empty = (0, Empty) 
-foo current@(count, mark) currentMark = if mark == currentMark
-                                        then (count + 1, mark)
-                                        else (1, currentMark)
+foldFn :: (Int, Mark) -> Mark -> (Int, Mark)
+foldFn win@(3, _) _ = win
+foldFn _ Empty = (0, Empty) 
+foldFn current@(count, mark) currentMark = if mark == currentMark
+                                           then (count + 1, mark)
+                                           else (1, currentMark)
                                                
 checkCount :: (Int, Mark) -> Bool
 checkCount (count, mark) = and[count >= 3, not $ mark == Empty]
@@ -25,4 +25,9 @@ instance Arbitrary Mark where
 
 prop_only_empty_elements_is_no_result xs = and [not $ elem Oh xs, not $ elem Ex xs] ==> result xs == False
 
-prop_three_in_a_row_has_a_result xs = or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]  ==> result xs == True 
+three_in_a_row xs = or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]
+
+prop_three_in_a_row_has_a_result xs = or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]  ==> result xs == True
+
+prop_two_rows x1s x2s = any (three_in_a_row) [x1s, x2s] ==> result2 x1s x2s == True
+                        where result2 rowOne rowTwo = or [result rowOne, result rowTwo]
