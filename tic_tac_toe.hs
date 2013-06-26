@@ -6,12 +6,11 @@ result :: [Mark] -> Bool
 result = checkCount . foldl foo (0, Empty)
 
 foo :: (Int, Mark) -> Mark -> (Int, Mark)
-foo win@(count, _) Empty = if count < 3 then (0, Empty) else win 
+foo win@(3, _) _ = win
+foo _ Empty = (0, Empty) 
 foo current@(count, mark) currentMark = if mark == currentMark
                                         then (count + 1, mark)
-                                        else if count < 3 
-                                             then (1, currentMark)
-                                             else current 
+                                        else (1, currentMark)
                                                
 checkCount :: (Int, Mark) -> Bool
 checkCount (count, mark) = and[count >= 3, not $ mark == Empty]
