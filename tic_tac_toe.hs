@@ -1,6 +1,11 @@
 import Data.List
 import Test.QuickCheck
 
+data Mark = Oh
+          | Ex
+          | Empty
+          deriving (Show, Eq)
+
 -- does the game have a result?
 resultN :: [[Mark]] -> Bool
 resultN rows = or[any result rows, any result (transpose rows)]
@@ -18,14 +23,8 @@ foldFn (count, a) b
 
 checkCount :: (Int, Mark) -> Bool
 checkCount (count, _) = count >= 3
-
-data Mark = Oh
-          | Ex
-          | Empty
-          deriving (Show, Eq)
                    
 -- Properties, generators and some helpers
-
 prop_only_empty_elements_is_no_result xs = and [not $ elem Oh xs, not $ elem Ex xs] ==> result xs == False
 
 prop_three_in_a_row_has_a_result xs = or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]  ==> result xs == True
