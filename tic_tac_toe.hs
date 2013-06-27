@@ -8,10 +8,10 @@ result = checkCount . foldl foldFn (0, Empty)
 foldFn :: (Int, Mark) -> Mark -> (Int, Mark)
 foldFn win@(3, _) _ = win
 foldFn _ Empty = (0, Empty) 
-foldFn current@(count, mark) currentMark = if mark == currentMark
-                                           then (count + 1, mark)
-                                           else (1, currentMark)
-                                               
+foldFn (count, a) b 
+  | a == b = (count + 1, a)
+  | otherwise = (1, b)           
+
 checkCount :: (Int, Mark) -> Bool
 checkCount (count, mark) = and[count >= 3, not $ mark == Empty]
 
