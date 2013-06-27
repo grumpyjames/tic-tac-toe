@@ -37,12 +37,8 @@ main = hspec $ do
       or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]  ==> result xs == True
     it "has a winner if there are three consecutive marks in any row" $ property $ \ttt ->
       any three_in_a_row (unwrap ttt) ==> resultN (unwrap ttt) == True
-
-prop_all_rows_start_with_x ttt = all (headEquals Ex) rows ==> resultN rows == True 
-  where rows = unwrap ttt
-
-count :: (Eq a) => a -> [a] -> Int
-count x = length . filter ((==) x)
+    it "has a winner if the first column is all Ex or Oh" $ property $ \ttt ->
+      or [all (headEquals Ex) (unwrap ttt), all (headEquals Oh) (unwrap ttt)] ==> resultN (unwrap ttt) == True 
 
 instance Arbitrary Mark where
   arbitrary = elements [Oh, Ex, Empty]
@@ -55,6 +51,9 @@ instance Arbitrary TicTacToe where
 
 unwrap :: TicTacToe -> [[Mark]]
 unwrap (TicTacToe rows) = rows 
+
+count :: (Eq a) => a -> [a] -> Int
+count x = length . filter ((==) x)
 
 three_in_a_row xs = or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]
                               
