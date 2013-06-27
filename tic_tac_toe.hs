@@ -1,5 +1,8 @@
 import Data.List
 import Test.QuickCheck
+import Test.Hspec
+import Control.Applicative
+import Control.Monad
 
 data Mark = Oh
           | Ex
@@ -25,15 +28,21 @@ checkCount :: (Int, Mark) -> Bool
 checkCount (count, _) = count >= 3
                    
 -- Properties, generators and some helpers
-prop_only_empty_elements_is_no_result xs = and [not $ elem Oh xs, not $ elem Ex xs] ==> result xs == False
 
-prop_three_in_a_row_has_a_result xs = or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]  ==> result xs == True
+main = hspec $ do 
+  describe "Calculations on a tic tac toe board" $ do 
+    it "has no winner if there are no more than two marks each" $ property $ \xs -> 
+      and [(count Oh xs) < 3, (count Ex xs) < 3] ==> result xs == False
+    it "has a winner if there are three of the same marks consecutively" $ property $ \xs ->
+      or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]  ==> result xs == True
 
 prop_three_in_any_row ttt = any (three_in_a_row) rows ==> resultN rows == True
   where rows = unwrap ttt
 prop_all_rows_start_with_x ttt = all (headEquals Ex) rows ==> resultN rows == True 
   where rows = unwrap ttt
 
+count :: (Eq a) => a -> [a] -> Int
+count x = length . filter ((==) x)
 
 instance Arbitrary Mark where
   arbitrary = elements [Oh, Ex, Empty]
