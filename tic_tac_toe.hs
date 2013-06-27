@@ -13,7 +13,7 @@ foldFn (count, a) b
   | otherwise = (1, b)           
 
 checkCount :: (Int, Mark) -> Bool
-checkCount (count, mark) = and[count >= 3, not $ mark == Empty]
+checkCount (count, _) = count >= 3
 
 resultN :: [[Mark]] -> Bool
 resultN rows = or[any result rows, any result (transpose rows)]
@@ -22,6 +22,8 @@ data Mark = Oh
           | Ex
           | Empty
           deriving (Show, Eq)
+                   
+-- The remainder here is test code and generators
 
 instance Arbitrary Mark where
   arbitrary = elements [Oh, Ex, Empty]
