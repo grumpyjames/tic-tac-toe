@@ -17,9 +17,11 @@ resultN rows = any result $ rows ++ (transpose rows) ++ (diagonals rows)
 result :: [Mark] -> Bool
 result = checkCount . foldl foldFn (0, Empty)
 
+-- evilly assumes three by three; match is horrendously non-exhaustive
 diagonals :: [[Mark]] -> [[Mark]]
 diagonals ((x1:x2:x3:[]):(y1:y2:y3:[]):(z1:z2:z3:[]):[]) = [[x1,y2,z3],[x3,y2,z1]]
 
+-- desperately tries to avoid looking anything like the property implementation in tests
 foldFn :: (Int, Mark) -> Mark -> (Int, Mark)
 foldFn win@(3, _) _ = win
 foldFn _ Empty = (0, Empty) 
