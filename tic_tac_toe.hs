@@ -15,11 +15,13 @@ foldFn current@(count, mark) currentMark = if mark == currentMark
 checkCount :: (Int, Mark) -> Bool
 checkCount (count, mark) = and[count >= 3, not $ mark == Empty]
 
-resultUgh :: GameRow -> Bool
-resultUgh (GameRow xs) = result xs
-
 resultN :: [GameRow] -> Bool
-resultN = any resultUgh
+resultN gameRows = or[any result rows, any result (transpose rows)]
+  where rows = unwrap gameRows
+
+unwrap :: [GameRow] -> [[Mark]]
+unwrap ((GameRow g):grs) = g:(unwrap grs) 
+unwrap [] = []
 
 data Mark = Oh
           | Ex
