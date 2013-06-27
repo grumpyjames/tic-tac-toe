@@ -35,9 +35,9 @@ main = hspec $ do
       and [(count Oh xs) < 3, (count Ex xs) < 3] ==> result xs == False
     it "has a winner if there are three of the same marks consecutively" $ property $ \xs ->
       or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]  ==> result xs == True
+    it "has a winner if there are three consecutive marks in any row" $ property $ \ttt ->
+      any three_in_a_row (unwrap ttt) ==> resultN (unwrap ttt) == True
 
-prop_three_in_any_row ttt = any (three_in_a_row) rows ==> resultN rows == True
-  where rows = unwrap ttt
 prop_all_rows_start_with_x ttt = all (headEquals Ex) rows ==> resultN rows == True 
   where rows = unwrap ttt
 
