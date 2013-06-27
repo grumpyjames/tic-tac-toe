@@ -45,12 +45,15 @@ main = hspec $ do
 instance Arbitrary Mark where
   arbitrary = elements [Oh, Ex, Empty]
 
-newtype TicTacToe = TicTacToe [[Mark]] deriving (Show, Eq)
+newtype TicTacToe = TicTacToe [[Mark]] deriving (Eq)
 instance Arbitrary TicTacToe where
   arbitrary = sized $ \s -> do
     rows <- vectorOf 3 (vectorOf 3 (elements [Oh, Ex, Empty]))
     return (TicTacToe rows)
-    
+
+instance Show TicTacToe where
+  show (TicTacToe xs) = foldl addLine "" $ map show xs
+    where addLine a b = a ++ "\n" ++ b
 three_in_any_column :: [[Mark]] -> Bool
 three_in_any_column xs = any three_in_a_row $ transpose xs
 
