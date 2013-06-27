@@ -23,7 +23,7 @@ data Mark = Oh
           | Empty
           deriving (Show, Eq)
                    
--- The remainder here is test code and generators
+-- Properties, generators and some helpers
 
 instance Arbitrary Mark where
   arbitrary = elements [Oh, Ex, Empty]
@@ -41,10 +41,10 @@ prop_only_empty_elements_is_no_result xs = and [not $ elem Oh xs, not $ elem Ex 
 
 prop_three_in_a_row_has_a_result xs = or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]  ==> result xs == True
 
-prop_three_in_any_row ttt = and[any (three_in_a_row) rows, length rows == 3] ==> (resultN rows) == True
-                  where rows = unwrap ttt
-prop_all_rows_start_with_x ttt = and[all (headEquals Ex) rows, length rows == 3] ==> (resultN rows) == True 
-                                 where rows = unwrap ttt
+prop_three_in_any_row ttt = any (three_in_a_row) rows ==> resultN rows == True
+  where rows = unwrap ttt
+prop_all_rows_start_with_x ttt = all (headEquals Ex) rows ==> resultN rows == True 
+  where rows = unwrap ttt
 
 n_by_n :: Int -> [[a]] -> Bool
 n_by_n desired_n rows = and[length rows == desired_n, all (lenEqual desired_n) rows]
