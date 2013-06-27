@@ -11,7 +11,7 @@ data Mark = Oh
 
 -- does the game have a result?
 resultN :: [[Mark]] -> Bool
-resultN rows = or[any result rows, any result (transpose rows)]
+resultN rows = any result $ rows ++ (transpose rows)
 
 -- does a row contain three in a row?
 result :: [Mark] -> Bool
@@ -39,7 +39,7 @@ main = hspec $ do
       any three_in_a_row (unwrap ttt) ==> resultN (unwrap ttt) == True
     it "has a winner if there are three consecutive marks in any column" $ property $ \ttt ->
       three_in_any_column (unwrap ttt) ==> resultN (unwrap ttt) == True 
-    it "has a winner if there are three marks in the positive diagonal" $ property $ \ttt ->
+    it "has a winner if there are three marks in the negative diagonal" $ property $ \ttt ->
       three_in_a_row (positive_diagonal (unwrap ttt)) ==> resultN (unwrap ttt) == True
 
 instance Arbitrary Mark where
