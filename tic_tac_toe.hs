@@ -37,8 +37,10 @@ main = hspec $ do
       or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]  ==> result xs == True
     it "has a winner if there are three consecutive marks in any row" $ property $ \ttt ->
       any three_in_a_row (unwrap ttt) ==> resultN (unwrap ttt) == True
-    it "has a winner if the first column is all Ex or Oh" $ property $ \ttt ->
-      or [all (headEquals Ex) (unwrap ttt), all (headEquals Oh) (unwrap ttt)] ==> resultN (unwrap ttt) == True 
+    it "has a winner if there are three consecutive marks in any column" $ property $ \ttt ->
+      three_in_any_column (unwrap ttt) ==> resultN (unwrap ttt) == True 
+    it "has a winner if there are three marks in the positive diagonal" $ property $ \ttt ->
+      three_in_a_row (positive_diagonal (unwrap ttt)) ==> resultN (unwrap ttt) == True
 
 instance Arbitrary Mark where
   arbitrary = elements [Oh, Ex, Empty]
@@ -48,6 +50,9 @@ instance Arbitrary TicTacToe where
   arbitrary = sized $ \s -> do
     rows <- vectorOf 3 (vectorOf 3 (elements [Oh, Ex, Empty]))
     return (TicTacToe rows)
+    
+three_in_any_column :: [[Mark]] -> Bool
+three_in_any_column xs = any three_in_a_row $ transpose xs
 
 unwrap :: TicTacToe -> [[Mark]]
 unwrap (TicTacToe rows) = rows 
@@ -55,8 +60,12 @@ unwrap (TicTacToe rows) = rows
 count :: (Eq a) => a -> [a] -> Int
 count x = length . filter ((==) x)
 
+three_in_a_row :: [Mark] -> Bool
 three_in_a_row xs = or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]
                               
+positive_diagonal :: [[Mark]] -> [Mark]
+positive_diagonal (x:y:z:[]) = [x !! 0, y !! 1, z !! 2]
+
 headEquals :: Mark -> [Mark] -> Bool                              
 headEquals x (y:ys) = x == y
 headEquals _ _ = False
