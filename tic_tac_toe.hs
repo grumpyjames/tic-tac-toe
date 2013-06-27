@@ -11,11 +11,14 @@ data Mark = Oh
 
 -- does the game have a result?
 resultN :: [[Mark]] -> Bool
-resultN rows = any result $ rows ++ (transpose rows)
+resultN rows = any result $ rows ++ (transpose rows) ++ (diagonals rows)
 
 -- does a row contain three in a row?
 result :: [Mark] -> Bool
 result = checkCount . foldl foldFn (0, Empty)
+
+diagonals :: [[Mark]] -> [[Mark]]
+diagonals ((x1:x2:x3:[]):(y1:y2:y3:[]):(z1:z2:z3:[]):[]) = [[x1,y2,z3],[x3,y2,z1]]
 
 foldFn :: (Int, Mark) -> Mark -> (Int, Mark)
 foldFn win@(3, _) _ = win
@@ -40,7 +43,7 @@ main = hspec $ do
     it "has a winner if there are three consecutive marks in any column" $ property $ \ttt ->
       three_in_any_column (unwrap ttt) ==> resultN (unwrap ttt) == True 
     it "has a winner if there are three marks in the negative diagonal" $ property $ \ttt ->
-      three_in_a_row (positive_diagonal (unwrap ttt)) ==> resultN (unwrap ttt) == True
+      any three_in_a_row (diagonalsOf (unwrap ttt)) ==> resultN (unwrap ttt) == True
 
 instance Arbitrary Mark where
   arbitrary = elements [Oh, Ex, Empty]
@@ -66,8 +69,8 @@ count x = length . filter ((==) x)
 three_in_a_row :: [Mark] -> Bool
 three_in_a_row xs = or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]
                               
-positive_diagonal :: [[Mark]] -> [Mark]
-positive_diagonal (x:y:z:[]) = [x !! 0, y !! 1, z !! 2]
+diagonalsOf :: [[Mark]] -> [[Mark]]
+diagonalsOf (x:y:z:[]) = [[x !! 0, y !! 1, z !! 2], [z !! 0, y !! 1, x !! 2]]
 
 headEquals :: Mark -> [Mark] -> Bool                              
 headEquals x (y:ys) = x == y
