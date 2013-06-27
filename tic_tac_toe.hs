@@ -35,15 +35,15 @@ checkCount (count, _) = count >= 3
 main = hspec $ do 
   describe "Calculations on a tic tac toe board" $ do 
     it "has no winner if there are no more than two marks each" $ property $ \xs -> 
-      and [(count Oh xs) < 3, (count Ex xs) < 3] ==> result xs == False
+      and [(count Oh xs) < 3, (count Ex xs) < 3] ==> not $ result xs
     it "has a winner if there are three of the same marks consecutively" $ property $ \xs ->
-      or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]  ==> result xs == True
+      or [[Oh, Oh, Oh] `isInfixOf` xs, [Ex, Ex, Ex] `isInfixOf` xs]  ==> result xs
     it "has a winner if there are three consecutive marks in any row" $ property $ \ttt ->
-      any three_in_a_row (unwrap ttt) ==> resultN (unwrap ttt) == True
+      any three_in_a_row (unwrap ttt) ==> resultN (unwrap ttt)
     it "has a winner if there are three consecutive marks in any column" $ property $ \ttt ->
-      three_in_any_column (unwrap ttt) ==> resultN (unwrap ttt) == True 
+      three_in_any_column (unwrap ttt) ==> resultN (unwrap ttt)
     it "has a winner if there are three marks in the negative diagonal" $ property $ \ttt ->
-      any three_in_a_row (diagonalsOf (unwrap ttt)) ==> resultN (unwrap ttt) == True
+      any three_in_a_row (diagonalsOf (unwrap ttt)) ==> resultN (unwrap ttt)
 
 instance Arbitrary Mark where
   arbitrary = elements [Oh, Ex, Empty]
