@@ -15,19 +15,19 @@ resultN rows = any result $ rows ++ (transpose rows) ++ (diagonals rows)
 
 -- does a row contain three in a row?
 result :: [Mark] -> Bool
-result = checkCount . foldl foldFn (0, Empty)
+result = checkCount . foldr rFoldFn (0, Empty)
 
 -- evilly assumes three by three; match is horrendously non-exhaustive
 diagonals :: [[Mark]] -> [[Mark]]
 diagonals ((x1:x2:x3:[]):(y1:y2:y3:[]):(z1:z2:z3:[]):[]) = [[x1,y2,z3],[x3,y2,z1]]
 
--- desperately tries to avoid looking anything like the property implementation in tests
-foldFn :: (Int, Mark) -> Mark -> (Int, Mark)
-foldFn win@(3, _) _ = win
-foldFn _ Empty = (0, Empty) 
-foldFn (count, a) b 
+rFoldFn :: Mark -> (Int, Mark) -> (Int, Mark)
+rFoldFn _ win@(3, _) = win
+rFoldFn Empty _ = (0, Empty) 
+rFoldFn b (count, a) 
   | a == b = (count + 1, a)
   | otherwise = (1, b)           
+
 
 checkCount :: (Int, Mark) -> Bool
 checkCount (count, _) = count >= 3
@@ -44,7 +44,7 @@ main = hspec $ do
       any three_in_a_row (unwrap ttt) ==> resultN (unwrap ttt)
     it "has a winner if there are three consecutive marks in any column" $ property $ \ttt ->
       three_in_any_column (unwrap ttt) ==> resultN (unwrap ttt)
-    it "has a winner if there are three marks in the negative diagonal" $ property $ \ttt ->
+    it "has a winner if there are three marks in a diagonal" $ property $ \ttt ->
       any three_in_a_row (diagonalsOf (unwrap ttt)) ==> resultN (unwrap ttt)
 
 instance Arbitrary Mark where
@@ -57,7 +57,7 @@ instance Arbitrary TicTacToe where
     return (TicTacToe rows)
 
 instance Show TicTacToe where
-  show (TicTacToe xs) = foldl addLine "" $ map show xs
+  show (TicTacToe xs) = foldr addLine "" $ map show xs
     where addLine a b = a ++ "\n" ++ b
 three_in_any_column :: [[Mark]] -> Bool
 three_in_any_column xs = any three_in_a_row $ transpose xs
