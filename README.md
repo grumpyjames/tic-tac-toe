@@ -1,5 +1,5 @@
-An experiment in using QuickCheck to drive design
-=================================================
+Using QuickCheck to drive design - an experiment
+------------------------------------------------
 
 Code resulting from the [Property Based TDD workshop](http://natpryce.com/articles/000802.html) at [SPA 2013](http://spaconference.org)
 
@@ -11,9 +11,9 @@ Code resulting from the [Property Based TDD workshop](http://natpryce.com/articl
 #### Discoveries
 
 * The best properties are those that have implementation different from their specification. Checking `isInfixOf` for both `Oh` and `Ex` involves examining the board twice; the `foldr` approach used avoids this.
-* Very specific properties might result in QuickCheck giving up on you. That's by no means a bad thing - get to the point where your implementation passes those thests, and then try a more generic property
+* Very specific properties might result in QuickCheck giving up on you. That's by no means a bad thing - get to the point where your implementation passes all the tests until QC gives up, and then try a more generic property.
 
 #### Further work
 
-* Still needs to work out who won, if there is a result
-* Extending the scorer for an `n` by `n` game might lead to more fun
+* Still needs to work out who won, if there is a result.
+* Extending the scorer for an `n` by `n` game might lead to more fun.
